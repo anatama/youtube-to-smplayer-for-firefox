@@ -1,0 +1,54 @@
+#!/bin/bash
+# Last change: 2012-06-23 11:52:44.
+# Author: Kosuke Uchida.
+# Description: YoutubeのURLをsmplayerで再生する
+
+VIDEOURL="http://www.youtube.com/watch"
+LISTURL="http://www.youtube.com/playlist"
+ERRORMSG="Youtubeの再生リストまたは動画のURLを指定してください"
+
+url=$1
+
+if [ $# -ne 1 ]; then
+    echo $ERRORMSG 1>&2
+    exit 1
+fi
+
+if [ $VIDEOURL = $(echo $url|cut -c1-${#VIDEOURL}) ]; then
+    type="video"
+elif [ $LISTURL = $(echo $url|cut -c1-${#LISTURL}) ]; then
+    type="list"
+else
+    echo $ERRORMSG 1>&2
+    exit 1
+fi
+
+action=$(zenity --list \
+    --title="smplayerで再生します" --text="再生する方法を選んでください" \
+    --radiolist --hide-header --hide-column=2\
+    --column="choice" --column="message" --column="dummy" \
+    true "play" "smplayerで再生する" \
+    false "add" "smplayerのプレイリストに追加する")
+if [ $? -ne 0 ]; then
+    echo "キャンセルが押されました" 1>&2
+    exit 1
+fi
+
+if [ $action = "play" -a $type = "video" ]; then
+    /usr/bin/smplayer $url &
+elif [ $action = "add" -a $type = "video" ]; then
+    /usr/bin/smplayer -add-to-playlist $url &
+elif [ $action = "play" -a $type = "list" ]; then
+    /usr/bin/smplayer &
+    /usr/bin/smplayer -send-action pl_remove_all
+    /usr/bin/smplayer -send-action stop
+    $(dirname $0)/tube-playlist-to-urls.py $url| \
+        xargs /usr/bin/smplayer -add-to-playlist
+    /usr/bin/smplayer -send-action pl_next
+    /usr/bin/smplayer -send-action pl_prev
+    /usr/bin/smplayer -send-action play
+else
+    /usr/bin/smplayer &
+    $(dirname $0)/tube-playlist-to-urls.py $url| \
+        xargs /usr/bin/smplayer -add-to-playlist
+fi
