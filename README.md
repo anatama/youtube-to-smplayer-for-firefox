@@ -40,15 +40,23 @@ Youtubeで観たい動画を検索する。
 * smplayer 0.8.0
 * Python 2.7.3
 
-smplayerについては、Youtubeの再生に対応した0.7.0以降が少なくとも必要。
+必要なもの
+------
+* bash
+* Firefox
+* Firefoxの拡張機能 AppLauncher
+* Python (あまり古いと動かないかも)
+* zenity
+* smplayer v0.7.0以降
 
 おまけ
 ------
-gitをインストールする方法。
+gitをインストールする方法。端末から次のコマンドを実行する。
 
     $ sudo apt-get install git
 
-最新版のsmplayerのインストール方法(0.7.0以降であれば必要ない)。
+最新版のsmplayerのインストール方法(0.7.0以降であれば必要ない)。  
+端末から次のコマンドを実行する。
 
     $ sudo add-apt-repository ppa:rvm/smplayer
     $ sudo apt-get update
